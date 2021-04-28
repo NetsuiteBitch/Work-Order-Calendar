@@ -1,0 +1,25 @@
+<manifest projecttype="ACCOUNTCUSTOMIZATION">
+  <projectname>Work Order Calender Suitelet</projectname>
+  <frameworkversion>1.0</frameworkversion>
+  <dependencies>
+    <features>
+      <feature required="true">SERVERSIDESCRIPTING</feature>
+      <feature required="false">CRM</feature>
+      <feature required="false">CREATESUITEBUNDLES</feature>
+    </features>
+    <objects>
+      <object>custbody_11187_pref_entity_bank</object>
+      <object>custbody_nsts_rm_rebate_attachment</object>
+      <object>customlist_operation_type</object>
+      <object>custrecordbomtype</object>
+      <object>custbody_11724_pay_bank_fees</object>
+      <object>custbody1</object>
+      <object>custbody_4599_mx_operation_type</object>
+      <object>customrecord_2663_entity_bank_details</object>
+      <object>custbody_4599_sg_import_permit_num</object>
+      <object>custbodyccinvnum</object>
+      <object>custbody_my_import_declaration_num</object>
+      <object>custbody_11724_bank_fee</object>
+    </objects>
+  </dependencies>
+</manifest>
