@@ -89,7 +89,7 @@ function(search) {
             // document.querySelector('#data_table_items_body').insertAdjacentHTML('beforeend', htmtablerow);
             jQuery("#data_table_items").DataTable().row.add(datearray).draw()
         }
-
+        jQuery("#data_table_items").DataTable().columns.adjust()
 
         console.log(orders)
 
@@ -109,31 +109,23 @@ function(search) {
 
         }
 
-
-
-
-
-        // var parsedresults = getAllSSResults(standardsearch)
-
-    //     function getAllSSResults(s) {
-    //         var results = s.run();
-    //         var searchResults = [];
-    //         var searchid = 0;
-    //         do {
-    //             var resultslice = results.getRange({start:searchid,end:searchid+1000});
-    //             resultslice.forEach(function(slice) {
-    //                     searchResults.push(slice);
-    //                     searchid++;
-    //                 }
-    //             );
-    //         } while (resultslice.length >=1000);
-    //         return searchResults;
-    //     }
-    // }
-
+        function validateField(scriptContext){
+            console.log("yolo2")
+            if(scriptContext.fieldId == "custpage_end_date"){
+                if (scriptContext.currentRecord.getValue("custpage_start_date") == "" || scriptContext.currentRecord.getValue("custpage_end_date") < scriptContext.currentRecord.getValue("custpage_start_date")){
+                    alert("Please enter a start date before the end date");
+                    return false
+                }else{
+                    return true
+                }
+            }else {
+                return true
+            }
+        }
 
     return {
         pageInit: pageInit,
+        validateField: validateField
 
     };
     

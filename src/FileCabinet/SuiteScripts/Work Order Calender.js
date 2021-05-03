@@ -120,7 +120,7 @@ define(['N/file', 'N/log', 'N/record', 'N/ui/serverWidget'],
             theInlineHTMLFld.defaultValue = '<!DOCTYPE html><html lang="e"><html><head><meta charset="UTF-8">' + dtCssCdn + dtJqueryCdn + dtJsCdn + '</head><body>' + dataTableHtml + executeDataTableHtml;
             response.writePage(form)
 
-            form.clientScriptFileId  = "9843"
+            form.clientScriptFileId  = "20802"
 
             function formatmmmdd(dt){
                 const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
