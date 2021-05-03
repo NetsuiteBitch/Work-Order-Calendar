@@ -31,22 +31,84 @@ function(search) {
         newfilters.push(search.createFilter({
             name: 'startdate',
             operator: search.Operator.WITHIN,
-            values: ["03/28/2021", "04/28/2021"]
+            // values: [startdate, endate]
+            values: [datetoddmmyyyy(startdate), datetoddmmyyyy(endate)]
         }));
 
 
-        var standardsearch = search.load({id: 'customsearch_mfgmob_buildworkorders'});
+        var standardsearch = search.load({id: 'customsearchwork_order_calendar'});
+
         var oldfilters = standardsearch.filters;
         for (var i = 0; i < newfilters.length; i++) {
             oldfilters.push(newfilters[i]);
         }
         standardsearch.filters = oldfilters;
-        console.log(standardsearch.filters)
 
-        standardsearch.run().each(function (line){
-            console.log("foo")})
+        var searchresult = standardsearch.run();
+
+        var orders= new Object()
+
+        searchresult.each((line) => {
+            orders[line.getValue({name:"displayname",join:"item"})] = new Object()
             return true
+        })
+
+        searchresult.each((line) => {
+            var item = line.getValue({name:"displayname",join:"item"});
+            var proddate = line.getValue("startdate");
+            var quantity = line.getValue("quantity");
+            var iid = line.getValue("internalid")
+            orders[item][proddate] = [quantity,iid];
+            return true
+        })
+
+        if (orders == {}){
+            return
         }
+
+        jQuery('.dataTables_empty').remove()
+
+        for (const [key, value] of Object.entries(orders)) {
+            console.log(key);
+            var datearray = []
+            datearray.push(key)
+            for (var d = new Date(startdate); d <= endate; d.setDate(d.getDate() + 1)) {
+                // console.log(d);
+                // console.log(value[datetoddmmyyyy(d)] || "")
+                if (typeof value[datetoddmmyyyy(d)] == "undefined"){
+                    datearray.push("")
+                }else {
+                    var account = document.location.href.split("/")[2].split(".")[0]
+                    var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?id=`
+                    var link = '<a href=' + handle + value[datetoddmmyyyy(d)][1] + '&whence= target="_blank">' + value[datetoddmmyyyy(d)][0] + "</a>"
+                    datearray.push(link)
+                }
+            }
+            console.log(datearray);
+            // var htmtablerow = "<tr><td>" + datearray.join("</td><td>") + "</td></tr>"
+            // document.querySelector('#data_table_items_body').insertAdjacentHTML('beforeend', htmtablerow);
+            jQuery("#data_table_items").DataTable().row.add(datearray).draw()
+        }
+
+
+        console.log(orders)
+
+        function datetoddmmyyyy(mydate) {
+            var dd = mydate.getDate();
+            var mm = mydate.getMonth() + 1;
+            var yyyy = mydate.getFullYear();
+            if (dd < 10) {
+                dd = "0" + dd;
+            }
+            if (mm < 10) {
+                mm = "0" + mm;
+            }
+            var formatteddate = mm + "/" + dd + "/" + yyyy;
+            return formatteddate
+        }
+
+        }
+
 
 
 
@@ -69,149 +131,10 @@ function(search) {
     //     }
     // }
 
-    /**
-     * Function to be executed when field is changed.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     * @param {string} scriptContext.fieldId - Field name
-     * @param {number} scriptContext.lineNum - Line number. Will be undefined if not a sublist or matrix field
-     * @param {number} scriptContext.columnNum - Line number. Will be undefined if not a matrix field
-     *
-     * @since 2015.2
-     */
-    function fieldChanged(scriptContext) {
-
-    }
-
-    /**
-     * Function to be executed when field is slaved.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     * @param {string} scriptContext.fieldId - Field name
-     *
-     * @since 2015.2
-     */
-    function postSourcing(scriptContext) {
-
-    }
-
-    /**
-     * Function to be executed after sublist is inserted, removed, or edited.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     *
-     * @since 2015.2
-     */
-    function sublistChanged(scriptContext) {
-
-    }
-
-    /**
-     * Function to be executed after line is selected.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     *
-     * @since 2015.2
-     */
-    function lineInit(scriptContext) {
-
-    }
-
-    /**
-     * Validation function to be executed when field is changed.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     * @param {string} scriptContext.fieldId - Field name
-     * @param {number} scriptContext.lineNum - Line number. Will be undefined if not a sublist or matrix field
-     * @param {number} scriptContext.columnNum - Line number. Will be undefined if not a matrix field
-     *
-     * @returns {boolean} Return true if field is valid
-     *
-     * @since 2015.2
-     */
-    function validateField(scriptContext) {
-
-    }
-
-    /**
-     * Validation function to be executed when sublist line is committed.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     *
-     * @returns {boolean} Return true if sublist line is valid
-     *
-     * @since 2015.2
-     */
-    function validateLine(scriptContext) {
-
-    }
-
-    /**
-     * Validation function to be executed when sublist line is inserted.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     *
-     * @returns {boolean} Return true if sublist line is valid
-     *
-     * @since 2015.2
-     */
-    function validateInsert(scriptContext) {
-
-    }
-
-    /**
-     * Validation function to be executed when record is deleted.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @param {string} scriptContext.sublistId - Sublist name
-     *
-     * @returns {boolean} Return true if sublist line is valid
-     *
-     * @since 2015.2
-     */
-    function validateDelete(scriptContext) {
-
-    }
-
-    /**
-     * Validation function to be executed when record is saved.
-     *
-     * @param {Object} scriptContext
-     * @param {Record} scriptContext.currentRecord - Current form record
-     * @returns {boolean} Return true if record is valid
-     *
-     * @since 2015.2
-     */
-    function saveRecord(scriptContext) {
-
-    }
 
     return {
         pageInit: pageInit,
-        // fieldChanged: fieldChanged,
-        // postSourcing: postSourcing,
-        // sublistChanged: sublistChanged,
-        // lineInit: lineInit,
-        // validateField: validateField,
-        // validateLine: validateLine,
-        // validateInsert: validateInsert,
-        // validateDelete: validateDelete,
-        // saveRecord: saveRecord
+
     };
     
 });

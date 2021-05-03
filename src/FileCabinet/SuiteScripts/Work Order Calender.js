@@ -35,13 +35,13 @@ define(['N/file', 'N/log', 'N/record', 'N/ui/serverWidget'],
             var enddate;
 
             if (request.method == 'GET'){
-
-             today = new Date(2021,   3, 23);
+             today = new Date();
              numrange = Array.from(Array(7).keys());
              daterange = numrange.map(x => formatmmmdd(addDays(today, x)));
              dateheaderrange = daterange.map(x => "<th>" + x + "</th>")
              dateheaders = dateheaderrange.join('')
-                startdate = new Date(2021, 3, 23)
+
+                startdate = new Date()
                 enddate = addDays(startdate,7)
             }else{
                 startdate = request.parameters.custpage_start_date !== "" ? new Date(request.parameters.custpage_start_date) : new Date()
