@@ -3,9 +3,9 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define(['N/search'],
+define(['N/search','N/ui/dialog'],
 
-function(search) {
+function(search,dialog) {
 
     /**
      * Function to be executed after page is initialized.
@@ -88,7 +88,7 @@ function(search) {
                     var account = document.location.href.split("/")[2].split(".")[0]
                     var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?`
                     var dateescaped = datetoddmmyyyy(d).replace(/\//g,"%2F")
-                    datearray.push(`<a style="padding: 3px" href="${handle}record.startdate=${dateescaped}&record.assemblyitem=${iiditemlookup[key]}&record.subsidiary=2"><div style="width:1em; height:1em; display:inline-block"></div></a>`)
+                    datearray.push(`<a style="padding: 3px" href="${handle}record.startdate=${dateescaped}&record.assemblyitem=${iiditemlookup[key]}&record.subsidiary=2" target="_blank"><div style="width:1em; height:1em; display:inline-block"></div></a>`)
                 }else {
                     var account = document.location.href.split("/")[2].split(".")[0]
                     var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?id=`
@@ -125,7 +125,9 @@ function(search) {
             console.log("yolo2")
             if(scriptContext.fieldId == "custpage_end_date"){
                 if (scriptContext.currentRecord.getValue("custpage_start_date") == "" || scriptContext.currentRecord.getValue("custpage_end_date") < scriptContext.currentRecord.getValue("custpage_start_date")){
-                    alert("Please enter a start date before the end date");
+                    // alert("Please enter a start date before the end date");
+                    scriptContext.currentRecord.setValue("custpage_end_date","");
+                    dialog.alert({title:"Invalid Date Range",message:"You must enter a start date before the end date"})
                     return false
                 }else{
                     return true
@@ -133,11 +135,12 @@ function(search) {
             }else {
                 return true
             }
+            return true
         }
 
     return {
         pageInit: pageInit,
-        validateField: validateField
+        // validateField: validateField
 
     };
     
