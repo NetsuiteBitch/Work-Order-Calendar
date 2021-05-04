@@ -47,18 +47,24 @@ function(search) {
         var searchresult = standardsearch.run();
 
         var orders= new Object()
+        var internalidlookup = new Object()
 
         searchresult.each((line) => {
-            orders[line.getValue({name:"displayname",join:"item"})] = new Object()
+            var itemname = line.getValue({name:"displayname",join:"item"})
+            var itemiid = line.getValue({name:"itemid",join:"item"})
+            var itemid = line.getValue({name:"internalid",join:"item"})
+            orders[itemid + "-" + itemname] = new Object()
+            internalidlookup[itemid + "-" + itemname] = itemiid
             return true
         })
 
         searchresult.each((line) => {
-            var item = line.getValue({name:"displayname",join:"item"});
+            var itemname = line.getValue({name:"displayname",join:"item"});
+            var itemid = line.getValue({name:"itemid",join:"item"});
             var proddate = line.getValue("startdate");
             var quantity = line.getValue("quantity");
             var iid = line.getValue("internalid")
-            orders[item][proddate] = [quantity,iid];
+            orders[itemid +"-" + itemname][proddate] = [quantity,iid];
             return true
         })
 
@@ -76,11 +82,15 @@ function(search) {
                 // console.log(d);
                 // console.log(value[datetoddmmyyyy(d)] || "")
                 if (typeof value[datetoddmmyyyy(d)] == "undefined"){
+                    var account = document.location.href.split("/")[2].split(".")[0]
+                    var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?`
+                    var dateescaped = datetoddmmyyyy(d).replace(/\//g,"%2F")
+                    //datearray.push(`<a style="padding: 3px" href="${handle}record.startdate=${dateescaped}&record.assemblyitem=${internalidlookup[key]}"><div style="width:1em; height:1em; display:inline-block"></div></a>`)
                     datearray.push("")
                 }else {
                     var account = document.location.href.split("/")[2].split(".")[0]
                     var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?id=`
-                    var link = '<a href=' + handle + value[datetoddmmyyyy(d)][1] + '&whence= target="_blank">' + value[datetoddmmyyyy(d)][0] + "</a>"
+                    var link = '<a style="padding: 3px" href=' + handle + value[datetoddmmyyyy(d)][1] + '&whence= target="_blank">' + value[datetoddmmyyyy(d)][0] + "</a>"
                     datearray.push(link)
                 }
             }
