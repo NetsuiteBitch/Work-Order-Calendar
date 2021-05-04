@@ -47,16 +47,17 @@ function(search) {
         var searchresult = standardsearch.run();
 
         var orders= new Object()
-        var internalidlookup = new Object()
+        var iiditemlookup = new Object()
 
         searchresult.each((line) => {
             var itemname = line.getValue({name:"displayname",join:"item"})
-            var itemiid = line.getValue({name:"itemid",join:"item"})
-            var itemid = line.getValue({name:"internalid",join:"item"})
+            var itemid = line.getValue({name:"itemid",join:"item"})
+            var itemiid = line.getValue({name:"internalid",join:"item"})
             orders[itemid + "-" + itemname] = new Object()
-            internalidlookup[itemid + "-" + itemname] = itemiid
+            iiditemlookup[itemid + "-" + itemname] = itemiid
             return true
         })
+        console.table(iiditemlookup)
 
         searchresult.each((line) => {
             var itemname = line.getValue({name:"displayname",join:"item"});
@@ -65,6 +66,7 @@ function(search) {
             var quantity = line.getValue("quantity");
             var iid = line.getValue("internalid")
             orders[itemid +"-" + itemname][proddate] = [quantity,iid];
+
             return true
         })
 
@@ -76,6 +78,7 @@ function(search) {
 
         for (const [key, value] of Object.entries(orders)) {
             console.log(key);
+            console.log(iiditemlookup[key])
             var datearray = []
             datearray.push(key)
             for (var d = new Date(startdate); d <= endate; d.setDate(d.getDate() + 1)) {
@@ -85,8 +88,7 @@ function(search) {
                     var account = document.location.href.split("/")[2].split(".")[0]
                     var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?`
                     var dateescaped = datetoddmmyyyy(d).replace(/\//g,"%2F")
-                    //datearray.push(`<a style="padding: 3px" href="${handle}record.startdate=${dateescaped}&record.assemblyitem=${internalidlookup[key]}"><div style="width:1em; height:1em; display:inline-block"></div></a>`)
-                    datearray.push("")
+                    datearray.push(`<a style="padding: 3px" href="${handle}record.startdate=${dateescaped}&record.assemblyitem=${iiditemlookup[key]}&record.subsidiary=2"><div style="width:1em; height:1em; display:inline-block"></div></a>`)
                 }else {
                     var account = document.location.href.split("/")[2].split(".")[0]
                     var handle = `https://${account}.app.netsuite.com/app/accounting/transactions/workord.nl?id=`
@@ -94,14 +96,14 @@ function(search) {
                     datearray.push(link)
                 }
             }
-            console.log(datearray);
+            // console.log(datearray);
             // var htmtablerow = "<tr><td>" + datearray.join("</td><td>") + "</td></tr>"
             // document.querySelector('#data_table_items_body').insertAdjacentHTML('beforeend', htmtablerow);
             jQuery("#data_table_items").DataTable().row.add(datearray).draw()
         }
         jQuery("#data_table_items").DataTable().columns.adjust()
 
-        console.log(orders)
+        // console.log(orders)
 
         function datetoddmmyyyy(mydate) {
             var dd = mydate.getDate();
